@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "extends": "@antfu",
+  "rules": {
+    "curly": ["error", "all"],
+    "indent": ["error", "tab"],
+    "no-tabs": "off",
+    "@typescript-eslint/indent": "off",
+    "no-mixed-spaces-and-tabs": "off",
+    "antfu/top-level-function": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "func-style": ["error", "expression"]
+  },
+  "globals": {
+    "vscode": "writable"
+  }
+}
