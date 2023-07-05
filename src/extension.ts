@@ -23,7 +23,7 @@ export const activate = async (context: vscode.ExtensionContext) => {
 		{
 			name: 'CSharpPlugin',
 			regex: [
-				/(?:(?:public|private|protected|internal|static|readonly|volatile)\s+)?([\w<>?]+)\s+(?:\[[^\]]*\]\s*)?[\w<>?,\s]+\s*;/g,
+				/(?:public|private|protected|internal|static|readonly|volatile)\s+([\w<>?]+)\s+(?:[\w<>?]+\s*(?:,\s*[\w<>?]+\s*)*)\s*;\s*(?:\/\/.*)?$/gm,
 			],
 			getConnection,
 		},

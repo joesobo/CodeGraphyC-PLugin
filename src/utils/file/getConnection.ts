@@ -2,62 +2,53 @@ import type { Edge, File, Node } from '../types'
 
 export const getConnection = (match: RegExpExecArray, file: File, fileIndex: number, nodes: Node[], edges: Edge[]) => {
 	const tempEdges: Edge[] = []
-	const importPath = match[1]
-	const fullPath = getFullPath(file.path, importPath)
+	let importPath = match[1]
 
-	const connectionIndex = findConnectionIndex(nodes, fullPath)
+	// filter out lowercase importpath
+	if(importPath.toLowerCase() === importPath) {
+		return { nodes: [], edges: tempEdges };
+	}
+
+	// Remove any List<> or ExampleClass<> wrapping
+	importPath = getGenericTypeContent(importPath);
+
+	const index = getNodeConnection(importPath, nodes)
 
 	// If the connection already exists or no connection found, skip it
 	if (
-		connectionIndex === -1
+		index === -1
 		|| edges.find(
-			connection => connection.id === `${fileIndex}-${connectionIndex}`,
+			connection => connection.id === `${fileIndex}-${index}`,
 		)
 	) { return { nodes: [], edges: tempEdges } }
 
 	tempEdges.push({
-		id: `${fileIndex}-${connectionIndex}`,
+		id: `${fileIndex}-${index}`,
 		to: fileIndex,
-		from: connectionIndex,
+		from: index,
 	})
 
 	return { nodes: [], edges: tempEdges }
 }
 
-// Get full path of import
-const getFullPath = (filePath: string, importPath: string) => {
-	const directory = filePath.substring(1).split('/')
-	const importPathArr = importPath.split('/')
-
-	// walk back relative path
-	if (importPath.startsWith('.')) {
-		if (importPath.startsWith('..')) {
-			directory.pop()
-		}
-
-		importPathArr.forEach((element) => {
-			if (element === '.' || element === '..') {
-				directory.pop()
-			}
-			else { directory.push(element) }
-		})
-		return `/${directory.join('/')}`
+export const getGenericTypeContent = (type: string): string => {
+	// Check if there is generic type wrapping
+	const match = type.match(/<(.+)>/);
+	if (match) {
+		// Extract the inner type and recursively call the function
+		// in case of nested generic types
+		return getGenericTypeContent(match[1]);
 	}
-	// find nearest node_modules
-	else {
-		directory.pop()
-		return ''
-	}
+	return type;
 }
 
-// Find index of connection
-const findConnectionIndex = (nodes: Node[], fullPath: string) => {
+const getNodeConnection = (importPath: string, nodes: Node[]) => {
 	let result = -1
 
 	nodes.forEach((node, index) => {
-		const nodePath = node.path.split('.')[0]
+		const nodePath = node.label.split('.')[0]
 
-		if (nodePath === fullPath) {
+		if (nodePath === importPath) {
 			result = index
 		}
 	})
