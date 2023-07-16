@@ -5,12 +5,12 @@ export const getConnection = (match: RegExpExecArray, file: File, fileIndex: num
 	let importPath = match[1]
 
 	// filter out lowercase importpath
-	if(importPath.toLowerCase() === importPath) {
-		return { nodes: [], edges: tempEdges };
+	if (importPath.toLowerCase() === importPath) {
+		return { nodes: [], edges: tempEdges }
 	}
 
 	// Remove any List<> or ExampleClass<> wrapping
-	importPath = getGenericTypeContent(importPath);
+	importPath = getGenericTypeContent(importPath)
 
 	const index = getNodeConnection(importPath, nodes)
 
@@ -33,13 +33,13 @@ export const getConnection = (match: RegExpExecArray, file: File, fileIndex: num
 
 export const getGenericTypeContent = (type: string): string => {
 	// Check if there is generic type wrapping
-	const match = type.match(/<(.+)>/);
+	const match = type.match(/<(.+)>/)
 	if (match) {
 		// Extract the inner type and recursively call the function
 		// in case of nested generic types
-		return getGenericTypeContent(match[1]);
+		return getGenericTypeContent(match[1])
 	}
-	return type;
+	return type
 }
 
 const getNodeConnection = (importPath: string, nodes: Node[]) => {
